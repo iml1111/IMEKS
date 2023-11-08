@@ -1,0 +1,59 @@
+# https://artifacthub.io/packages/helm/fluent/fluent-bit?modal=values&path=config
+config:
+  inputs: |
+    [INPUT]
+        Name tail
+        Exclude_Path /var/log/containers/cloudwatch-agent*, /var/log/containers/fluent-bit*, /var/log/containers/aws-node*, /var/log/containers/kube-proxy*, /var/log/containers/aws-load-balancer*, /var/log/containers/cert-manager*, /var/log/containers/coredns*, /var/log/containers/ebs-csi*, /var/log/containers/grafana*, /var/log/containers/karpenter*, /var/log/containers/metrics-server*, /var/log/containers/prometheus* 
+        Path /var/log/containers/*.log
+        Tag kube.*
+        Mem_Buf_Limit 50MB
+        Refresh_Interval 10
+        multiline.parser custom-multi
+
+  outputs: |
+    [OUTPUT]
+        Name            es
+        Match           kube.*
+        Host            ${es_domain_name}
+        Port            443
+        TLS             On
+        AWS_Auth        On
+        AWS_Region      ${region}
+        Retry_Limit     6
+        Replace_Dots    On
+        Trace_Error     On    
+
+  filters: |
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+        Merge_Log On
+        Merge_Log_Key       log_processed
+        Keep_Log Off
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude On
+    
+    [FILTER]
+        Name parser
+        Match kube.*
+        Key_Name log
+        Parser log_timestamp 
+        Preserve_Key On
+        Reserve_Data On
+
+  customParsers: |
+    [MULTILINE_PARSER]
+        name          custom-multi
+        type          regex
+        flush_timeout 1000
+        rule      "start_state"   "/stderr F(.*)/"  "cont"
+        rule      "cont"          "/stderr F(.*)/"  "cont"
+    
+    [PARSER] 
+        Name log_timestamp
+        Format regex
+        Regex ^(?<log_time>[^\s]+)
+        Time_Key log_time
+        Time_Format %Y-%m-%dT%H:%M:%S.%LZ
+        Time_Keep On
+        
