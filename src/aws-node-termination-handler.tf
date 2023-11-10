@@ -2,6 +2,7 @@
 resource "helm_release" "aws_node_termination_handler" {
   repository = "https://aws.github.io/eks-charts/"
   chart      = "aws-node-termination-handler"
+  #version    = "0.21.0"
 
   name            = "aws-node-termination-handler"
   namespace       = "kube-system"
