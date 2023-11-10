@@ -21,3 +21,9 @@ resource "kubernetes_namespace" "karpenter" {
     name = "karpenter"
   }
 }
+
+resource "kubernetes_namespace" "fluent_bit" {
+  metadata {
+    name = "fluent-bit"
+  }
+}
