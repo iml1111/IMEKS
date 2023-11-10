@@ -167,7 +167,6 @@ module "eks" {
 
   aws_auth_users = [
     {
-      # TODO: Use a variable for the username
       userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${var.iam_username}"
       username = var.iam_username
       groups   = ["system:masters"]

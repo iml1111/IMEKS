@@ -1,6 +1,4 @@
 # https://artifacthub.io/packages/helm/fluent/fluent-bit?modal=values&path=config
-# TODO: AWS OpenSearch Service로 변경
-# https://docs.fluentbit.io/manual/pipeline/outputs/opensearch
 config:
   inputs: |
     [INPUT]
@@ -14,16 +12,17 @@ config:
 
   outputs: |
     [OUTPUT]
-        Name            es
+        Name            opensearch
         Match           kube.*
-        Host            ${es_domain_name}
+        Host            ${search_domain_name}
         Port            443
         TLS             On
         AWS_Auth        On
         AWS_Region      ${region}
         Retry_Limit     6
         Replace_Dots    On
-        Trace_Error     On    
+        Trace_Error     On
+        Suppress_Type_Name On
 
   filters: |
     [FILTER]

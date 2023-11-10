@@ -175,10 +175,9 @@ resource "aws_iam_policy" "fluent_bit" {
       {
         Effect = "Allow"
         Action = [
-          "es:ESHttp*",
+          "es:*",
         ]
-
-        Resource = "arn:aws:es:${var.region}:${data.aws_caller_identity.current.account_id}:domain/*"
+        Resource = "*"
       },
       # AWS CloudWatch Policy
       {
