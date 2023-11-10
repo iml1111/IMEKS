@@ -1,4 +1,6 @@
 # https://artifacthub.io/packages/helm/fluent/fluent-bit?modal=values&path=config
+# TODO: AWS OpenSearch Service로 변경
+# https://docs.fluentbit.io/manual/pipeline/outputs/opensearch
 config:
   inputs: |
     [INPUT]
