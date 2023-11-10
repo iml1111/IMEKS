@@ -12,7 +12,8 @@ resource "helm_release" "grafana" {
   depends_on = [
     module.eks,
     kubernetes_namespace.grafana,
-    kubectl_manifest.gp3_light_storageclass
+    kubectl_manifest.gp3_light_storageclass,
+    helm_release.prometheus,
   ]
 
   values = [

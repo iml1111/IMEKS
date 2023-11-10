@@ -1,6 +1,6 @@
 # EKS Cluster & NodeGroup
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
+  source = "terraform-aws-modules/eks/aws"
   #version = "19.19.0"
 
   cluster_name                   = var.cluster_name
@@ -114,7 +114,7 @@ module "eks" {
       }
 
       tags = {
-        Stage = var.stage
+        Stage  = var.stage
         Author = var.author
       }
     }
@@ -152,7 +152,7 @@ module "eks" {
       }
 
       tags = {
-        Stage = var.stage
+        Stage  = var.stage
         Author = var.author
       }
     }
@@ -241,7 +241,7 @@ resource "aws_iam_policy" "additional" {
 }
 
 module "kms" {
-  source  = "terraform-aws-modules/kms/aws"
+  source = "terraform-aws-modules/kms/aws"
   #version = "2.1.0"
 
   aliases               = ["eks/${var.cluster_name}"]

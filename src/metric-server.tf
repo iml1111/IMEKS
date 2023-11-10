@@ -1,8 +1,8 @@
 # https://artifacthub.io/packages/helm/metrics-server/metrics-server
 resource "helm_release" "metrics_server" {
-  namespace       = "kube-system"
-  name            = "metrics-server"
-  chart           = "metrics-server"
+  namespace = "kube-system"
+  name      = "metrics-server"
+  chart     = "metrics-server"
   #version         = "3.11.0"
   repository      = "https://kubernetes-sigs.github.io/metrics-server/"
   cleanup_on_fail = true
