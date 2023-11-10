@@ -1,3 +1,9 @@
+variable "author" {
+  type        = string
+  description = "Author of the deployment"
+  default     = "IML"
+}
+
 variable "stage" {
   type        = string
   description = "Product Stage"

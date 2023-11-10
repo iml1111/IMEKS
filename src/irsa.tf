@@ -16,7 +16,7 @@ module "load_balancer_controller_irsa_role" {
 
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -36,7 +36,7 @@ module "cert_manager_irsa_role" {
 
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -55,7 +55,7 @@ module "cluster_autoscaler_irsa_role" {
   }
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -74,7 +74,7 @@ module "ebs_csi_irsa_role" {
 
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -96,7 +96,7 @@ module "efs_csi_irsa_role" {
 
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -121,7 +121,7 @@ resource "aws_iam_policy" "kms_encrytion_ebs" {
 
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -141,7 +141,7 @@ module "vpc_cni_ipv4_irsa_role" {
 
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -160,7 +160,7 @@ module "fluent_bit_irsa_role" {
   }
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -207,6 +207,6 @@ resource "aws_iam_policy" "fluent_bit" {
 
   tags = {
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }

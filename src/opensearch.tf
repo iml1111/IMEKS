@@ -46,7 +46,7 @@
 #   }
 #   # TODO: vpc_options VPC based private 구축 필요
 #   tags = {
-#     Author = local.author
+#     Author = var.author
 #     Stage  = var.stage
 #   }
 # }

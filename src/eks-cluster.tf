@@ -115,7 +115,7 @@ module "eks" {
 
       tags = {
         Stage = var.stage
-        Author = local.author
+        Author = var.author
       }
     }
 
@@ -153,7 +153,7 @@ module "eks" {
 
       tags = {
         Stage = var.stage
-        Author = local.author
+        Author = var.author
       }
     }
   }
@@ -179,7 +179,7 @@ module "eks" {
   tags = {
     "karpenter.sh/discovery" = var.cluster_name,
     Stage                    = var.stage
-    Author                   = local.author
+    Author                   = var.author
   }
 }
 # https://github.com/bryantbiggs/eks-desired-size-hack
@@ -236,7 +236,7 @@ resource "aws_iam_policy" "additional" {
   tags = {
     Name   = "${var.cluster_name}-additional"
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -252,6 +252,6 @@ module "kms" {
   tags = {
     Name   = "${var.cluster_name}-kms"
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }

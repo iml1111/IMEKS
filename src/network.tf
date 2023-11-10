@@ -44,7 +44,7 @@ module "vpc" {
   tags = {
     Name   = var.vpc_name
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -68,7 +68,7 @@ resource "aws_security_group" "additional" {
   tags = {
     Name   = "${var.cluster_name}-additional-sg"
     Stage  = var.stage
-    Author = local.author
+    Author = var.author
   }
 }
 
@@ -88,7 +88,7 @@ module "vpc_endpoints" {
       tags = {
         Name   = "${var.vpc_name}-s3-vpc-endpoint"
         Stage  = var.stage
-        Author = local.author
+        Author = var.author
       }
     }
   }
