@@ -101,7 +101,7 @@ module "efs_csi_irsa_role" {
 }
 
 resource "aws_iam_policy" "kms_encrytion_ebs" {
-  name        = var.kms_encryption_ebs_policy_name
+  name        = "${var.cluster_name}-${var.stage}-kms-encryption-ebs}"
   description = "${var.cluster_name} KMS Encryption EBS IAM Policy"
 
   policy = jsonencode({

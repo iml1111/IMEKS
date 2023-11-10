@@ -31,7 +31,7 @@ variable "cluster_name" {
 variable "cluster_version" {
   type        = string
   description = "EKS Cluster Version"
-  default     = "1.27"
+  default     = "1.28"
 }
 
 variable "grafana_master_user_name" {
@@ -44,10 +44,4 @@ variable "grafana_master_user_pw" {
   type        = string
   description = "Grafana Master User Pw"
   default     = "!imeks_password"
-}
-
-variable "kms_encryption_ebs_policy_name" {
-  type        = string
-  description = "KMS Encryption EBS Policy Name"
-  default     = "eks-dev-kms-encryption-ebs"
 }
