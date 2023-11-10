@@ -61,5 +61,11 @@ variable "search_master_name" {
 variable "search_master_pw" {
   type        = string
   description = "OpenSearch Master User Pw"
-  default     = "!imeks_password"
+  default     = "!Imeks_password123"
+}
+
+variable "iam_username" {
+  type        = string
+  description = "IAM User Name"
+  default     = "terraform"
 }
