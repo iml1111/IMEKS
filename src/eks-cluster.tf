@@ -82,7 +82,7 @@ module "eks" {
 
   eks_managed_node_groups = {
     frontend = {
-      name           = "${var.eks_stage}-frontend"
+      name           = "${var.cluster_name}-${var.stage}-frontend"
       subnet_ids     = module.vpc.public_subnets
       instance_types = ["c5a.xlarge"]
       capacity_type  = "SPOT"
@@ -96,7 +96,7 @@ module "eks" {
       }
 
       labels = {
-        nodegroup-type = "${var.eks_stage}-frontend"
+        nodegroup-type = "${var.cluster_name}-${var.stage}-frontend"
       }
 
       block_device_mappings = {
@@ -120,7 +120,7 @@ module "eks" {
     }
 
     backend = {
-      name           = "${var.eks_stage}-backend"
+      name           = "${var.cluster_name}-${var.stage}-backend"
       subnet_ids     = module.vpc.private_subnets
       instance_types = ["c5a.xlarge"]
       capacity_type  = "SPOT"
@@ -134,7 +134,7 @@ module "eks" {
       }
 
       labels = {
-        nodegroup-type = "${var.eks_stage}-backend"
+        nodegroup-type = "${var.cluster_name}-${var.stage}-backend"
       }
 
       block_device_mappings = {

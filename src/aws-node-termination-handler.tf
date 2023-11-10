@@ -43,10 +43,10 @@ resource "helm_release" "aws_node_termination_handler" {
   }
   set {
     name  = "nodeSelector.nodegroup-type"
-    value = "${var.eks_stage}-frontend"
+    value = "${var.cluster_name}-${var.stage}-frontend"
   }
   set {
     name  = "nodeSelector.nodegroup-type"
-    value = "${var.eks_stage}-backend"
+    value = "${var.cluster_name}-${var.stage}-backend"
   }
 }

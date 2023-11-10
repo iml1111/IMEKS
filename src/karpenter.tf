@@ -89,7 +89,7 @@ resource "kubectl_manifest" "karpenter_frontend_provisioner" {
       ttlSecondsUntilExpired: 2592000
       ttlSecondsAfterEmpty: 30
       labels:
-        nodegroup-type: ${var.eks_stage}-frontend    
+        nodegroup-type: ${var.cluster_name}-${var.stage}-frontend    
   YAML
 
   depends_on = [
@@ -123,7 +123,7 @@ resource "kubectl_manifest" "karpenter_backend_provisioner" {
       ttlSecondsUntilExpired: 2592000
       ttlSecondsAfterEmpty: 30
       labels:
-        nodegroup-type: ${var.eks_stage}-backend   
+        nodegroup-type: ${var.cluster_name}-${var.stage}-backend   
   YAML
 
   depends_on = [
@@ -143,7 +143,7 @@ resource "kubectl_manifest" "karpenter_frontend_node_template" {
       securityGroupSelector:
         karpenter.sh/discovery: ${module.eks.cluster_name}
       tags:
-        Name: ${var.eks_stage}-frontend-karpenter
+        Name: ${var.cluster_name}-${var.stage}-frontend-karpenter
         karpenter.sh/discovery: ${module.eks.cluster_name}
   YAML
 
@@ -164,7 +164,7 @@ resource "kubectl_manifest" "karpenter_backend_node_template" {
       securityGroupSelector:
         karpenter.sh/discovery: ${module.eks.cluster_name}
       tags:
-        Name: ${var.eks_stage}-backend-karpenter
+        Name: ${var.cluster_name}-${var.stage}-backend-karpenter
         karpenter.sh/discovery: ${module.eks.cluster_name}
   YAML
 

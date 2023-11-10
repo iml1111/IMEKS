@@ -4,7 +4,7 @@
 module "load_balancer_controller_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name                              = "${var.eks_stage}-load-balancer-controller"
+  role_name = "${var.cluster_name}-${var.stage}-load-balancer-controller"
   attach_load_balancer_controller_policy = true
 
   oidc_providers = {
@@ -23,7 +23,7 @@ module "load_balancer_controller_irsa_role" {
 module "cert_manager_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name                     = "${var.eks_stage}-cert-manager"
+  role_name                     = "${var.cluster_name}-${var.stage}-cert-manager"
   attach_cert_manager_policy    = true
   cert_manager_hosted_zone_arns = ["arn:aws:route53:::hostedzone/IClearlyMadeThisUp"]
 
@@ -43,7 +43,7 @@ module "cert_manager_irsa_role" {
 module "cluster_autoscaler_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name                        = "${var.eks_stage}-cluster-autoscaler"
+  role_name                        = "${var.cluster_name}-${var.stage}-cluster-autoscaler"
   attach_cluster_autoscaler_policy = true
   cluster_autoscaler_cluster_ids   = [module.eks.cluster_name]
 
@@ -62,7 +62,7 @@ module "cluster_autoscaler_irsa_role" {
 module "ebs_csi_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name             = "${var.eks_stage}-ebs-csi"
+  role_name             = "${var.cluster_name}-${var.stage}-ebs-csi"
   attach_ebs_csi_policy = true
 
   oidc_providers = {
@@ -128,7 +128,7 @@ resource "aws_iam_policy" "kms_encrytion_ebs" {
 module "vpc_cni_ipv4_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name             = "${var.eks_stage}-vpc-cni-ipv4"
+  role_name             = "${var.cluster_name}-${var.stage}-vpc-cni-ipv4"
   attach_vpc_cni_policy = true
   vpc_cni_enable_ipv4   = true
 
