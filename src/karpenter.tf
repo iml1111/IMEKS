@@ -13,9 +13,10 @@ module "karpenter" {
   create_iam_role                 = false
   iam_role_arn                    = module.eks.eks_managed_node_groups["backend"].iam_role_arn
 
-  depends_on = [
-    kubernetes_namespace.karpenter,
-  ]
+  tags = {
+    Stage  = var.stage
+    Author = var.author
+  }
 }
 
 resource "helm_release" "karpenter" {
