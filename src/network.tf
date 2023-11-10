@@ -38,7 +38,7 @@ module "vpc" {
   vpc_tags = {
     Name                                        = var.vpc_name
     Stage                                       = var.stage
-    Author                                      = local.author
+    Author                                      = var.author
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
   tags = {

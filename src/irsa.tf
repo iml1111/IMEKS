@@ -148,7 +148,7 @@ module "vpc_cni_ipv4_irsa_role" {
 module "fluent_bit_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name = var.fluent_bit_iam_role_policy_name
+  role_name = "${var.cluster_name}-${var.stage}-fluent-bit"
   oidc_providers = {
     ex = {
       provider_arn               = module.eks.oidc_provider_arn
@@ -165,7 +165,7 @@ module "fluent_bit_irsa_role" {
 }
 
 resource "aws_iam_policy" "fluent_bit" {
-  name        = var.fluent_bit_iam_role_policy_name
+  name        = "${var.cluster_name}-${var.stage}-fluent-bit"
   description = "${var.cluster_name} Fluent Bit IAM Policy"
 
   policy = jsonencode({
