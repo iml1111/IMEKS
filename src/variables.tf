@@ -34,14 +34,32 @@ variable "cluster_version" {
   default     = "1.28"
 }
 
-variable "grafana_master_user_name" {
+variable "search_domain_name" {
+  type        = string
+  description = "OpenSearch Domain Name"
+  default     = "imeks-dev-log"
+}
+
+variable "grafana_master_name" {
   type        = string
   description = "Grafana Master Username"
   default     = "imeks_grafana"
 }
 
-variable "grafana_master_user_pw" {
+variable "grafana_master_pw" {
   type        = string
   description = "Grafana Master User Pw"
+  default     = "!imeks_password"
+}
+
+variable "search_master_name" {
+  type        = string
+  description = "OpenSearch Master Username"
+  default     = "imeks_opensearch"
+}
+
+variable "search_master_pw" {
+  type        = string
+  description = "OpenSearch Master User Pw"
   default     = "!imeks_password"
 }

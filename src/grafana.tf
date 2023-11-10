@@ -38,10 +38,10 @@ resource "helm_release" "grafana" {
   }
   set {
     name  = "adminUser"
-    value = var.grafana_master_user_name
+    value = var.grafana_master_name
   }
   set {
     name  = "adminPassword"
-    value = var.grafana_master_user_pw
+    value = var.grafana_master_pw
   }
 }

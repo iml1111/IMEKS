@@ -192,7 +192,7 @@ resource "null_resource" "update_frontend_desired_size" {
     interpreter = ["/bin/bash", "-c"]
 
     command = <<-EOT
-      aws eks update-nodegroup-config --cluster-name ${module.eks.cluster_name} --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["frontend"].node_group_id), 1)} --scaling-config desiredSize=${local.frontend_nodegroup_desired_size}
+      aws eks update-nodegroup-config --cluster-name ${module.eks.cluster_name} --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["frontend"].node_group_id), 1)} --region ${var.region} --scaling-config desiredSize=${local.frontend_nodegroup_desired_size}
     EOT
   }
 
@@ -209,7 +209,7 @@ resource "null_resource" "update_backend_desired_size" {
     interpreter = ["/bin/bash", "-c"]
 
     command = <<-EOT
-      aws eks update-nodegroup-config --cluster-name ${module.eks.cluster_name} --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["backend"].node_group_id), 1)} --scaling-config desiredSize=${local.backend_nodegroup_desired_size}
+      aws eks update-nodegroup-config --cluster-name ${module.eks.cluster_name} --nodegroup-name ${element(split(":", module.eks.eks_managed_node_groups["backend"].node_group_id), 1)} --region ${var.region} --scaling-config desiredSize=${local.backend_nodegroup_desired_size}
     EOT
   }
   depends_on = [
