@@ -1,5 +1,6 @@
 # IMEKS
 Boilerplate for Kubernetes Infrastructure As Code in AWS using Terraform (Updated at 2023-11-13)
+![image](https://github.com/iml1111/IMEKS/assets/29897277/eb606a12-8a6c-4f6c-881b-e8155c39d283)
 
 # Structure Summary
 - Kubernetes 1.28+ on EKS
