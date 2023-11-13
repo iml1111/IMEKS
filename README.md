@@ -2,6 +2,17 @@
 Boilerplate for Kubernetes Infrastructure As Code in AWS using Terraform (Updated at 2023-11-13)
 ![image](https://github.com/iml1111/IMEKS/assets/29897277/eb606a12-8a6c-4f6c-881b-e8155c39d283)
 
+# Get Started
+To build infrastructure, you need the following tools:
+- AWS CLI
+- Terraform CLI
+- kubectl
+```shell
+$ terraform init
+$ terraform plan
+$ terraform apply --auto-approve
+```
+
 # Structure Summary
 - Kubernetes 1.28+ on EKS
 - 2AZ, Public/Private/Intra Subnets
@@ -38,13 +49,3 @@ Boilerplate for Kubernetes Infrastructure As Code in AWS using Terraform (Update
 - [karpenter v0.32.1](https://artifacthub.io/packages/helm/karpenter/karpenter)
 - [metrics-server 3.11.0](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
 
-# Get Started
-To build infrastructure, you need the following tools:
-- AWS CLI
-- Terraform CLI
-- kubectl
-```shell
-$ terraform init
-$ terraform plan
-$ terraform apply --auto-approve
-```
