@@ -13,7 +13,8 @@ resource "kubectl_manifest" "gp3_storageclass" {
   YAML
 
   depends_on = [
-    module.eks
+    module.eks,
+    module.ebs_csi_irsa_role,
   ]
 }
 
@@ -33,6 +34,7 @@ resource "kubectl_manifest" "gp3_light_storageclass" {
   YAML
 
   depends_on = [
-    module.eks
+    module.eks,
+    module.ebs_csi_irsa_role,
   ]
 }
