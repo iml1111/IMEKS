@@ -1,6 +1,6 @@
 resource "aws_opensearch_domain" "log" {
   domain_name = var.search_domain_name
-  #engine_version = "OpenSearch_2.9"
+  #engine_version = "OpenSearch_2.11"
 
   cluster_config {
     dedicated_master_enabled = false
@@ -68,6 +68,7 @@ resource "null_resource" "update_fluent_bit_role_all_access" {
   triggers = {
     search_master_name = var.search_master_name
     search_master_pw   = var.search_master_pw
+    fluent_bit_role_arn = module.fluent_bit_irsa_role.iam_role_arn
   }
 
   provisioner "local-exec" {
@@ -89,6 +90,8 @@ resource "null_resource" "update_fluent_bit_role_all_access" {
   }
 
   depends_on = [
-    aws_opensearch_domain.log
+    aws_opensearch_domain.log,
+    aws_opensearch_domain_policy.log,
+    module.fluent_bit_irsa_role
   ]
 }
