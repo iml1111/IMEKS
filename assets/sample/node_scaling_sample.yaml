@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-flask-deployment-heavy
+  labels:
+    app: hello-flask-heavy
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: hello-flask-heavy
+  template:
+    metadata:
+      labels:
+        app: hello-flask-heavy
+    spec:
+      containers:
+      - image: iml1111/hello_flask
+        imagePullPolicy: Always
+        name: hello-flask-heavy
+        resources:
+          requests:
+            cpu: 1
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+      nodeSelector:
+        nodegroup-type: "imeks-dev-frontend"
