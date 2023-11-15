@@ -12,6 +12,17 @@ $ terraform init
 $ terraform plan
 $ terraform apply --auto-approve
 ```
+## kubectl CLI
+```shell
+$ aws eks --region <REGION> update-kubeconfig --name <CLUSTER_NAME>
+```
+
+## Grafana Dashboard
+If you select `ClusterIP` as `service.type`, you can connect through port-forwarding as follows.
+```shell
+$ kubectl port-forward -n grafana deploy/grafana 8081:3000
+```
+If you select `LoadBalancer`, you will be able to directly access the Endpoint of the LoadBalancer.
 
 # Structure Summary
 - Kubernetes 1.28+ on EKS
@@ -29,6 +40,21 @@ $ terraform apply --auto-approve
   - Grafana
   - K8s Metric Server
 - Cert Manager, Etc.
+
+# Directories
+```
+<IMEKS>
+├── LICENSE
+├── README.md
+├── assets
+│   ├── sample/
+│   └── terraform_backend/
+└── src/
+    └─ helm_values/
+```
+- `src/`: Infrastructrue as code.
+- `assets/sample/`: Sample services to run on the cluster.
+- `assets/terraform_backend`: Backend for managing Terraform State.
 
 ## Terraform Modules
 - [IRSAs in EKS 5.30.1](https://github.com/terraform-aws-modules/terraform-aws-iam/tree/v5.30.1/modules/iam-role-for-service-accounts-eks)
