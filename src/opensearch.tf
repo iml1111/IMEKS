@@ -66,8 +66,8 @@ resource "aws_opensearch_domain_policy" "log" {
 
 resource "null_resource" "update_fluent_bit_role_all_access" {
   triggers = {
-    search_master_name = var.search_master_name
-    search_master_pw   = var.search_master_pw
+    search_master_name  = var.search_master_name
+    search_master_pw    = var.search_master_pw
     fluent_bit_role_arn = module.fluent_bit_irsa_role.iam_role_arn
   }
 
