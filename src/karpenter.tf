@@ -1,6 +1,7 @@
 # https://github.com/terraform-aws-modules/terraform-aws-eks/tree/v19.19.0/modules/karpenter
 # https://artifacthub.io/packages/helm/karpenter/karpenter
 # https://github.com/aws/karpenter
+# TODO: https://karpenter.sh/docs/upgrading/v1beta1-migration/
 
 module "karpenter" {
   source = "terraform-aws-modules/eks/aws//modules/karpenter"
