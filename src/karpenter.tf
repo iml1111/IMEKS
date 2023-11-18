@@ -1,16 +1,17 @@
+# https://karpenter.sh/docs/upgrading/upgrade-guide/
 # https://github.com/terraform-aws-modules/terraform-aws-eks/tree/v19.19.0/modules/karpenter
-# https://artifacthub.io/packages/helm/karpenter/karpenter
 # https://github.com/aws/karpenter
-# TODO: https://karpenter.sh/docs/upgrading/v1beta1-migration/
+# TODO: 각 노드 클래스마다 다른 IAM Role을 할당할 수 있나?
 
 module "karpenter" {
   source = "terraform-aws-modules/eks/aws//modules/karpenter"
-  #version = "v19.19.0"
+  #version = "v19.20.0"
 
   cluster_name = module.eks.cluster_name
 
   irsa_oidc_provider_arn          = module.eks.oidc_provider_arn
   irsa_namespace_service_accounts = ["karpenter:karpenter"]
+  enable_karpenter_instance_profile_creation = true
   create_iam_role                 = false
   iam_role_arn                    = module.eks.eks_managed_node_groups["backend"].iam_role_arn
 
@@ -60,38 +61,54 @@ resource "helm_release" "karpenter" {
 
   depends_on = [
     kubernetes_namespace.karpenter,
+    module.karpenter,
   ]
 }
 
-
-# Frontend nodegroup
-resource "kubectl_manifest" "karpenter_frontend_provisioner" {
+resource "kubectl_manifest" "karpenter_frontend_nodepool" {
   yaml_body = <<-YAML
-    apiVersion: karpenter.sh/v1alpha5
-    kind: Provisioner
+    apiVersion: karpenter.sh/v1beta1
+    kind: NodePool
     metadata:
-      name: karpenter-frontend-provisioner
+      name: karpenter-frontend-nodepool
     spec:
-      requirements:
-        - key: "node.kubernetes.io/instance-type" 
-          operator: In
-          values: ["c5a.xlarge"]
-        - key: "topology.kubernetes.io/zone" 
-          operator: In
-          values: ["${var.region}a", "${var.region}c"]
-        - key: karpenter.sh/capacity-type
-          operator: In
-          values: ["spot", "on-demand"]
+      disruption:
+        consolidateAfter: 30s
+        consolidationPolicy: WhenEmpty
+        expireAfter: 720h0m0s
       limits:
-        resources:
-          cpu: 1000
-          memory: 1000Gi
-      providerRef:
-        name: frontend-template
-      ttlSecondsUntilExpired: 2592000
-      ttlSecondsAfterEmpty: 30
-      labels:
-        nodegroup-type: ${var.cluster_name}-${var.stage}-frontend    
+        cpu: 1k
+        memory: 1000Gi
+      template:
+        metadata:
+          labels:
+            nodegroup-type: ${var.cluster_name}-${var.stage}-frontend
+        spec:
+          nodeClassRef:
+            name: frontend-nodeclass
+          requirements:
+          - key: node.kubernetes.io/instance-type
+            operator: In
+            values:
+            - c5a.xlarge
+          - key: topology.kubernetes.io/zone
+            operator: In
+            values:
+            - ${var.region}a
+            - ${var.region}c
+          - key: karpenter.sh/capacity-type
+            operator: In
+            values:
+            - spot
+            - on-demand
+          - key: kubernetes.io/os
+            operator: In
+            values:
+            - linux
+          - key: kubernetes.io/arch
+            operator: In
+            values:
+            - amd64  
   YAML
 
   depends_on = [
@@ -99,33 +116,50 @@ resource "kubectl_manifest" "karpenter_frontend_provisioner" {
   ]
 }
 
-resource "kubectl_manifest" "karpenter_backend_provisioner" {
+resource "kubectl_manifest" "karpenter_backend_nodepool" {
   yaml_body = <<-YAML
-    apiVersion: karpenter.sh/v1alpha5
-    kind: Provisioner
+    apiVersion: karpenter.sh/v1beta1
+    kind: NodePool
     metadata:
-      name: karpenter-backend-provisioner
+      name: karpenter-backend-nodepool
     spec:
-      requirements:
-        - key: "node.kubernetes.io/instance-type" 
-          operator: In
-          values: ["c5a.xlarge"]
-        - key: "topology.kubernetes.io/zone" 
-          operator: In
-          values: ["${var.region}a", "${var.region}c"]
-        - key: karpenter.sh/capacity-type
-          operator: In
-          values: ["spot", "on-demand"]
+      disruption:
+        consolidateAfter: 30s
+        consolidationPolicy: WhenEmpty
+        expireAfter: 720h0m0s
       limits:
-        resources:
-          cpu: 1000
-          memory: 1000Gi
-      providerRef:
-        name: backend-template
-      ttlSecondsUntilExpired: 2592000
-      ttlSecondsAfterEmpty: 30
-      labels:
-        nodegroup-type: ${var.cluster_name}-${var.stage}-backend   
+        cpu: 1k
+        memory: 1000Gi
+      template:
+        metadata:
+          labels:
+            nodegroup-type: ${var.cluster_name}-${var.stage}-backend
+        spec:
+          nodeClassRef:
+            name: backend-nodeclass
+          requirements:
+          - key: node.kubernetes.io/instance-type
+            operator: In
+            values:
+            - c5a.xlarge
+          - key: topology.kubernetes.io/zone
+            operator: In
+            values:
+            - ${var.region}a
+            - ${var.region}c
+          - key: karpenter.sh/capacity-type
+            operator: In
+            values:
+            - spot
+            - on-demand
+          - key: kubernetes.io/os
+            operator: In
+            values:
+            - linux
+          - key: kubernetes.io/arch
+            operator: In
+            values:
+            - amd64
   YAML
 
   depends_on = [
@@ -133,17 +167,21 @@ resource "kubectl_manifest" "karpenter_backend_provisioner" {
   ]
 }
 
-resource "kubectl_manifest" "karpenter_frontend_node_template" {
+resource "kubectl_manifest" "karpenter_frontend_nodeclass" {
   yaml_body = <<-YAML
-    apiVersion: karpenter.k8s.aws/v1alpha1
-    kind: AWSNodeTemplate
+    apiVersion: karpenter.k8s.aws/v1beta1
+    kind: EC2NodeClass
     metadata:
-      name: frontend-template
+      name: frontend-nodeclass
     spec:
-      subnetSelector:
-        karpenter.sh/discovery: ${module.eks.cluster_name}
-      securityGroupSelector:
-        karpenter.sh/discovery: ${module.eks.cluster_name}
+      amiFamily: AL2
+      role: ${module.eks.eks_managed_node_groups["frontend"].iam_role_name}
+      securityGroupSelectorTerms:
+      - tags:
+          karpenter.sh/discovery: ${module.eks.cluster_name}
+      subnetSelectorTerms:
+      - tags:
+          karpenter.sh/discovery: ${module.eks.cluster_name}
       tags:
         Name: ${var.cluster_name}-${var.stage}-frontend-karpenter
         karpenter.sh/discovery: ${module.eks.cluster_name}
@@ -154,17 +192,21 @@ resource "kubectl_manifest" "karpenter_frontend_node_template" {
   ]
 }
 
-resource "kubectl_manifest" "karpenter_backend_node_template" {
+resource "kubectl_manifest" "karpenter_backend_nodeclass" {
   yaml_body = <<-YAML
-    apiVersion: karpenter.k8s.aws/v1alpha1
-    kind: AWSNodeTemplate
+    apiVersion: karpenter.k8s.aws/v1beta1
+    kind: EC2NodeClass
     metadata:
-      name: backend-template
+      name: backend-nodeclass
     spec:
-      subnetSelector:
-        karpenter.sh/discovery: ${module.eks.cluster_name}
-      securityGroupSelector:
-        karpenter.sh/discovery: ${module.eks.cluster_name}
+      amiFamily: AL2
+      role: ${module.eks.eks_managed_node_groups["backend"].iam_role_name}
+      securityGroupSelectorTerms:
+      - tags:
+          karpenter.sh/discovery: ${module.eks.cluster_name}
+      subnetSelectorTerms:
+      - tags:
+          karpenter.sh/discovery: ${module.eks.cluster_name}
       tags:
         Name: ${var.cluster_name}-${var.stage}-backend-karpenter
         karpenter.sh/discovery: ${module.eks.cluster_name}
