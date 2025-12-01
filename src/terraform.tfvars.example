@@ -1,0 +1,49 @@
+# =============================================================================
+# IMEKS Configuration Example
+# =============================================================================
+# Copy this file to terraform.tfvars and customize:
+#   cp terraform.tfvars.example terraform.tfvars
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# REQUIRED: You must set this value
+# -----------------------------------------------------------------------------
+project_name = "my-eks"  # Max 9 characters (AWS IAM role name limit)
+
+# -----------------------------------------------------------------------------
+# COMMONLY CUSTOMIZED (Optional)
+# -----------------------------------------------------------------------------
+# aws_region          = "ap-northeast-2"
+# environment         = "dev"
+# kubernetes_version  = "1.32"
+
+# -----------------------------------------------------------------------------
+# NETWORK CONFIGURATION (Optional)
+# -----------------------------------------------------------------------------
+# vpc_cidr                  = "10.0.0.0/16"
+# availability_zones_count  = 2
+# single_nat_gateway        = true  # false for HA (higher cost)
+
+# -----------------------------------------------------------------------------
+# NODE GROUP CONFIGURATION (Optional)
+# -----------------------------------------------------------------------------
+# node_instance_types = ["c5.xlarge"]
+# node_capacity_type  = "ON_DEMAND"  # or "SPOT"
+# node_desired_size   = 2
+# node_min_size       = 1
+# node_max_size       = 5
+# node_disk_size      = 50
+
+# -----------------------------------------------------------------------------
+# ADDON VERSIONS (Optional)
+# -----------------------------------------------------------------------------
+# metrics_server_chart_version = "3.12.2"
+# alb_controller_chart_version = "1.16.0"
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL TAGS (Optional)
+# -----------------------------------------------------------------------------
+# tags = {
+#   Team        = "platform"
+#   CostCenter  = "engineering"
+# }

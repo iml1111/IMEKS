@@ -1,78 +1,192 @@
-# IMEKS
-Boilerplate for Kubernetes Infrastructure As Code in AWS using Terraform (Updated at 2023-11-13)
+# IMEKS - AWS EKS Terraform Boilerplate
 
-![image](https://github.com/iml1111/IMEKS/assets/29897277/eb606a12-8a6c-4f6c-881b-e8155c39d283)
+Production-ready AWS EKS infrastructure boilerplate using Terraform. Deploy a complete Kubernetes cluster with a single `terraform apply`.
 
-# Get Started
-To build infrastructure, you need the following tools:
-- AWS CLI
-- Terraform CLI
-- kubectl
-```shell
-$ terraform init
-$ terraform plan
-$ terraform apply --auto-approve
+## Features
+
+- **EKS Cluster**: Kubernetes 1.32 with managed node groups
+- **VPC**: Multi-AZ VPC with public/private subnets
+- **Metrics Server**: Pre-installed for HPA/VPA support
+- **ALB Ingress Controller**: AWS Load Balancer Controller with IRSA
+- **Security**: IMDSv2 enforcement, EBS encryption, VPC Flow Logs
+- **Remote State**: S3 + DynamoDB backend support
+
+## Architecture
+
 ```
-## kubectl CLI
-```shell
-$ aws eks --region <REGION> update-kubeconfig --name <CLUSTER_NAME>
+┌─────────────────────────────────────────────────────────────────┐
+│                          AWS Region                              │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                           VPC                              │  │
+│  │  ┌─────────────────┐  ┌─────────────────┐                │  │
+│  │  │  Public Subnet  │  │  Public Subnet  │                │  │
+│  │  │   (AZ-a)        │  │   (AZ-b)        │                │  │
+│  │  │   NAT GW        │  │                 │                │  │
+│  │  └─────────────────┘  └─────────────────┘                │  │
+│  │                                                           │  │
+│  │  ┌─────────────────┐  ┌─────────────────┐                │  │
+│  │  │ Private Subnet  │  │ Private Subnet  │                │  │
+│  │  │   (AZ-a)        │  │   (AZ-b)        │                │  │
+│  │  │  ┌───────────┐  │  │  ┌───────────┐  │                │  │
+│  │  │  │EKS Node   │  │  │  │EKS Node   │  │                │  │
+│  │  │  │(c5.xlarge)│  │  │  │(c5.xlarge)│  │                │  │
+│  │  │  └───────────┘  │  │  └───────────┘  │                │  │
+│  │  └─────────────────┘  └─────────────────┘                │  │
+│  │                                                           │  │
+│  │  ┌─────────────────────────────────────────────────────┐ │  │
+│  │  │                    EKS Cluster                       │ │  │
+│  │  │  • Metrics Server                                    │ │  │
+│  │  │  • AWS Load Balancer Controller (IRSA)               │ │  │
+│  │  │  • CoreDNS, kube-proxy, vpc-cni                      │ │  │
+│  │  └─────────────────────────────────────────────────────┘ │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Grafana Dashboard
-If you select `ClusterIP` as `service.type`, you can connect through port-forwarding as follows.
-```shell
-$ kubectl port-forward -n grafana deploy/grafana 8081:3000
+## Prerequisites
+
+- Terraform >= 1.5.0
+- AWS CLI configured with appropriate credentials
+- kubectl (optional, for cluster access)
+
+## Quick Start
+
+### 1. Setup Terraform Backend (Optional but Recommended)
+
+```bash
+cd assets/terraform_backend
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your values
+terraform init
+terraform apply
 ```
-If you select `LoadBalancer`, you will be able to directly access the Endpoint of the LoadBalancer.
 
-# Structure Summary
-- Kubernetes 1.28+ on EKS
-- 2AZ, Public/Private/Intra Subnets
-- 2 Managed Nodegroups(Frontend, Backend)
-- Cluster AutoScaling with Karpenter
-  - AWS Node Termination Handler 
-- Ingress Controller with AWS Load Balancer
-- EFK Log Pipeline
-  - Fleunt-bit
-  - AWS Opensearch Service
-  - Opensearch DashBoard (Kibana Alternative)
-- Cluster Montioring
-  - Prometheus
-  - Grafana
-  - K8s Metric Server
-- Cert Manager, Etc.
+### 2. Deploy EKS Infrastructure
 
-# Directories
+```bash
+cd src
+cp terraform.tfvars.example terraform.tfvars
+cp backend.tf.example backend.tf
+# Edit terraform.tfvars and backend.tf with your values
+terraform init
+terraform apply
 ```
-<IMEKS>
-├── LICENSE
-├── README.md
-├── assets
-│   ├── sample/
-│   └── terraform_backend/
-└── src/
-    └─ helm_values/
+
+### 3. Configure kubectl
+
+```bash
+aws eks update-kubeconfig --region ap-northeast-2 --name <cluster-name>
 ```
-- `src/`: Infrastructrue as code.
-- `assets/sample/`: Sample services to run on the cluster.
-- `assets/terraform_backend`: Backend for managing Terraform State.
 
-## Terraform Modules
-- [IRSAs in EKS 5.30.1](https://github.com/terraform-aws-modules/terraform-aws-iam/tree/v5.30.1/modules/iam-role-for-service-accounts-eks)
-- [eks 19.19.0](https://github.com/terraform-aws-modules/terraform-aws-eks)
-- [kms 2.1.0](https://github.com/terraform-aws-modules/terraform-aws-kms)
-- [karpenter v19.19.0](https://github.com/terraform-aws-modules/terraform-aws-eks/tree/v19.19.0/modules/karpenter)
-- [vpc 5.1.2](https://github.com/terraform-aws-modules/terraform-aws-vpc)
-- [vpc-endpoints 5.1.2](https://github.com/terraform-aws-modules/terraform-aws-vpc/tree/v5.1.2/modules/vpc-endpoints)
+## Directory Structure
 
-## Helm Release
+```
+.
+├── assets/
+│   └── terraform_backend/     # S3 + DynamoDB backend setup
+│       ├── main.tf
+│       ├── variables.tf
+│       ├── outputs.tf
+│       ├── versions.tf
+│       └── README.md
+├── src/
+│   ├── main.tf                # Main orchestration
+│   ├── variables.tf           # Input variables
+│   ├── outputs.tf             # Output values
+│   ├── locals.tf              # Local values
+│   ├── providers.tf           # Provider configuration
+│   ├── versions.tf            # Version constraints
+│   ├── backend.tf.example     # Backend configuration template
+│   ├── terraform.tfvars.example
+│   ├── modules/
+│   │   ├── vpc/               # VPC module
+│   │   ├── eks/               # EKS module
+│   │   └── addons/            # Kubernetes addons (metrics-server, alb-controller)
+│   └── helm_values/           # Helm chart values
+│       ├── metrics-server.yaml
+│       └── aws-load-balancer-controller.yaml
+├── examples/
+│   └── hello-world/           # Example deployment
+└── README.md
+```
 
-- [aws-load-balancer-controller 1.6.2](https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller)
-- [aws-node-termination-handler 0.21.0](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
-- [cert-manager v1.13.2](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-- [fluent-bit 0.39.1](https://artifacthub.io/packages/helm/fluent/fluent-bit)
-- [prometheus 25.4.0](https://artifacthub.io/packages/helm/prometheus-community/prometheus)
-- [grafana 7.0.3](https://artifacthub.io/packages/helm/grafana/grafana)
-- [karpenter v0.32.1](https://artifacthub.io/packages/helm/karpenter/karpenter)
-- [metrics-server 3.11.0](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
+## Configuration
 
+### Required Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `project_name` | Project name for resource naming | - |
+| `environment` | Environment name | `dev` |
+| `region` | AWS region | `ap-northeast-2` |
+
+### Optional Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `cluster_version` | Kubernetes version | `1.32` |
+| `vpc_cidr` | VPC CIDR block | `10.0.0.0/16` |
+| `node_instance_types` | Node instance types | `["c5.xlarge"]` |
+| `node_desired_size` | Desired node count | `2` |
+| `node_min_size` | Minimum node count | `1` |
+| `node_max_size` | Maximum node count | `5` |
+| `node_capacity_type` | ON_DEMAND or SPOT | `ON_DEMAND` |
+| `single_nat_gateway` | Use single NAT GW | `true` |
+
+See `src/variables.tf` for full list of configurable options.
+
+## Module Versions
+
+| Module/Provider | Version |
+|-----------------|---------|
+| terraform | >= 1.5.0 |
+| hashicorp/aws | ~> 6.0 |
+| hashicorp/kubernetes | ~> 2.38 |
+| hashicorp/helm | ~> 3.1 |
+| terraform-aws-modules/vpc/aws | 6.5.1 |
+| terraform-aws-modules/eks/aws | 21.10.1 |
+| terraform-aws-modules/iam/aws | 6.2.3 |
+| metrics-server (Helm) | 3.12.2 |
+| aws-load-balancer-controller (Helm) | 1.16.0 |
+
+## Outputs
+
+| Output | Description |
+|--------|-------------|
+| `cluster_name` | EKS cluster name |
+| `cluster_endpoint` | EKS API endpoint |
+| `configure_kubectl` | Command to configure kubectl |
+| `vpc_id` | VPC ID |
+| `alb_controller_role_arn` | ALB Controller IAM role ARN |
+
+## Example Deployment
+
+Deploy a sample application with ALB Ingress:
+
+```bash
+kubectl apply -f examples/hello-world/
+```
+
+## Security Features
+
+- **IMDSv2 Required**: Instance metadata service v2 enforced on all nodes
+- **EBS Encryption**: Node volumes encrypted at rest
+- **VPC Flow Logs**: Network traffic logging enabled
+- **IRSA**: IAM roles for service accounts (no static credentials)
+- **Private Nodes**: Worker nodes in private subnets only
+
+## Cleanup
+
+```bash
+# Remove EKS infrastructure
+cd src
+terraform destroy
+
+# Remove backend (optional)
+cd assets/terraform_backend
+terraform destroy
+```
+
+## License
+
+MIT License
