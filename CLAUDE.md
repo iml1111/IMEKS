@@ -20,7 +20,7 @@ assets/terraform_backend/  # S3 + DynamoDB for remote state
 
 ## Key Design Decisions
 
-1. **IRSA Implementation**: Using `terraform-aws-modules/iam/aws v6.2.3` submodule (`iam-role-for-service-accounts-eks`) since EKS module v21.x removed native IRSA support
+1. **IRSA Implementation**: Using `terraform-aws-modules/iam/aws v6.2.3` submodule (`iam-role-for-service-accounts`) since EKS module v21.x removed native IRSA support
 
 2. **Node Groups**: Single managed node group (`main`) with:
    - AL2023 AMI
@@ -31,6 +31,8 @@ assets/terraform_backend/  # S3 + DynamoDB for remote state
 3. **Addons**: Always enabled (no toggle variables)
    - Metrics Server (chart 3.12.2)
    - AWS Load Balancer Controller (chart 1.16.0)
+
+4. **Naming Constraint**: `project_name` max 9 characters (AWS IAM role name limit: 38 chars)
 
 ## Module Dependencies
 
@@ -44,7 +46,7 @@ VPC → EKS → Addons
 - Terraform: >= 1.5.0
 - AWS Provider: ~> 6.0
 - Kubernetes Provider: ~> 2.38
-- Helm Provider: ~> 3.1
+- Helm Provider: ~> 3.1 (uses `kubernetes = {}` syntax, not block)
 
 ## Common Tasks
 
@@ -65,3 +67,9 @@ Update `vpc_cidr` in `terraform.tfvars` and adjust `local.private_subnet_cidrs` 
 - `src/variables.tf` ↔ `src/terraform.tfvars.example` (sync variable definitions)
 - `src/modules/*/variables.tf` ↔ `src/main.tf` (module inputs)
 - `src/modules/*/outputs.tf` ↔ `src/outputs.tf` (output propagation)
+
+## Known Gotchas
+
+- **Helm 3.x syntax**: Use `kubernetes = { ... }` not `kubernetes { ... }` block
+- **IAM module v6.x**: Output names are `arn`, `name` (not `iam_role_arn`, `iam_role_name`)
+- **EKS module v21.x**: Variable names changed (e.g., `name` not `cluster_name`, `kubernetes_version` not `cluster_version`)
