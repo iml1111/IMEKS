@@ -83,7 +83,6 @@ metadata:
   namespace: hello-world
   annotations:
     # AWS Load Balancer Controller annotations
-    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-path: /
@@ -91,6 +90,7 @@ metadata:
     # Optional: Add tags to the ALB
     alb.ingress.kubernetes.io/tags: Environment=dev,Application=hello-world
 spec:
+  ingressClassName: alb
   rules:
     - http:
         paths:
