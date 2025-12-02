@@ -60,6 +60,7 @@ VPC → EKS → Addons
 - AWS Provider: ~> 6.0
 - Kubernetes Provider: ~> 2.38
 - Helm Provider: ~> 3.1
+- **EKS/Kubernetes**: 1.34 (default, configurable via `kubernetes_version` variable)
 
 ## Common Tasks
 
