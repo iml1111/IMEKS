@@ -6,6 +6,7 @@ Production-ready AWS EKS infrastructure boilerplate using Terraform. Deploy a co
 
 - **EKS Cluster**: Kubernetes 1.32 with managed node groups
 - **VPC**: Multi-AZ VPC with public/private subnets
+- **EKS Addons**: CoreDNS, kube-proxy, vpc-cni, aws-ebs-csi-driver
 - **Metrics Server**: Pre-installed for HPA/VPA support
 - **ALB Ingress Controller**: AWS Load Balancer Controller with IRSA
 - **Security**: IMDSv2 enforcement, EBS encryption, VPC Flow Logs
@@ -37,7 +38,7 @@ Production-ready AWS EKS infrastructure boilerplate using Terraform. Deploy a co
 │  │  │                    EKS Cluster                       │ │  │
 │  │  │  • Metrics Server                                    │ │  │
 │  │  │  • AWS Load Balancer Controller (IRSA)               │ │  │
-│  │  │  • CoreDNS, kube-proxy, vpc-cni                      │ │  │
+│  │  │  • CoreDNS, kube-proxy, vpc-cni, ebs-csi-driver      │ │  │
 │  │  └─────────────────────────────────────────────────────┘ │  │
 │  └───────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
@@ -112,6 +113,9 @@ aws eks update-kubeconfig --region ap-northeast-2 --name <cluster-name>
 │       └── aws-load-balancer-controller.yaml
 ├── examples/
 │   └── hello-world/           # Example deployment
+├── scripts/                   # Deployment/cleanup scripts
+│   ├── deploy-example.sh
+│   └── cleanup-example.sh
 └── README.md
 ```
 
@@ -129,14 +133,12 @@ aws eks update-kubeconfig --region ap-northeast-2 --name <cluster-name>
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `cluster_version` | Kubernetes version | `1.32` |
+| `kubernetes_version` | Kubernetes version | `1.32` |
 | `vpc_cidr` | VPC CIDR block | `10.0.0.0/16` |
-| `node_instance_types` | Node instance types | `["c5.xlarge"]` |
-| `node_desired_size` | Desired node count | `2` |
-| `node_min_size` | Minimum node count | `1` |
-| `node_max_size` | Maximum node count | `5` |
-| `node_capacity_type` | ON_DEMAND or SPOT | `ON_DEMAND` |
+| `availability_zones_count` | Number of AZs | `2` |
 | `single_nat_gateway` | Use single NAT GW | `true` |
+
+> **Note**: Node group settings (instance type, size, etc.) are hardcoded in `src/modules/eks/main.tf` for simplicity. Modify directly if needed.
 
 See `src/variables.tf` for full list of configurable options.
 
@@ -151,7 +153,7 @@ See `src/variables.tf` for full list of configurable options.
 | terraform-aws-modules/vpc/aws | 6.5.1 |
 | terraform-aws-modules/eks/aws | 21.10.1 |
 | terraform-aws-modules/iam/aws | 6.2.3 |
-| metrics-server (Helm) | 3.12.2 |
+| metrics-server (Helm) | 3.13.0 |
 | aws-load-balancer-controller (Helm) | 1.16.0 |
 
 ## Outputs
@@ -166,8 +168,17 @@ See `src/variables.tf` for full list of configurable options.
 
 ## Example Deployment
 
-Deploy a sample application with ALB Ingress:
+Deploy and test a sample application with ALB Ingress:
 
+```bash
+# Deploy and test (includes ALB provisioning wait)
+./scripts/deploy-example.sh
+
+# Cleanup
+./scripts/cleanup-example.sh
+```
+
+Or manually:
 ```bash
 kubectl apply -f examples/hello-world/
 ```
