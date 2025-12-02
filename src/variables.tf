@@ -1,71 +1,129 @@
-variable "author" {
+# =============================================================================
+# Required Variables
+# =============================================================================
+
+variable "project_name" {
+  description = "Project name used as prefix for all resources"
   type        = string
-  description = "Author of the deployment"
-  default     = "IML"
+
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9-]{1,8}$", var.project_name))
+    error_message = "Project name must be lowercase alphanumeric with hyphens, 2-9 characters, starting with a letter. (AWS IAM role name limit: 38 chars)"
+  }
 }
 
-variable "stage" {
+# =============================================================================
+# General Configuration
+# =============================================================================
+
+variable "aws_region" {
+  description = "AWS region for deployment"
   type        = string
-  description = "Product Stage"
+  default     = "ap-northeast-2"
+}
+
+variable "environment" {
+  description = "Environment name (e.g., dev, staging, prod)"
+  type        = string
   default     = "dev"
+
+  validation {
+    condition     = contains(["dev", "staging", "prod", "testbed"], var.environment)
+    error_message = "Environment must be one of: dev, staging, prod, testbed."
+  }
 }
 
-variable "region" {
+# =============================================================================
+# Network Configuration
+# =============================================================================
+
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
   type        = string
-  description = "AWS Region"
-  default     = "us-east-1"
+  default     = "10.0.0.0/16"
+
+  validation {
+    condition     = can(cidrhost(var.vpc_cidr, 0))
+    error_message = "VPC CIDR must be a valid IPv4 CIDR block."
+  }
 }
 
-variable "vpc_name" {
-  type        = string
-  description = "VPC Name"
-  default     = "imeks"
+variable "availability_zones_count" {
+  description = "Number of availability zones (2-3 recommended)"
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.availability_zones_count >= 2 && var.availability_zones_count <= 3
+    error_message = "Availability zones count must be 2 or 3."
+  }
 }
 
-variable "cluster_name" {
-  type        = string
-  description = "EKS Cluster Name"
-  default     = "imeks"
+variable "single_nat_gateway" {
+  description = "Use single NAT gateway (cost-saving) vs one per AZ (high availability)"
+  type        = bool
+  default     = true
 }
 
-variable "cluster_version" {
+# =============================================================================
+# EKS Configuration
+# =============================================================================
+
+variable "kubernetes_version" {
+  description = "Kubernetes version for EKS cluster"
   type        = string
-  description = "EKS Cluster Version"
-  default     = "1.28"
+  default     = "1.34"
+
+  validation {
+    condition     = can(regex("^1\\.(2[89]|3[0-9])$", var.kubernetes_version))
+    error_message = "Kubernetes version must be 1.28 or higher."
+  }
 }
 
-variable "search_domain_name" {
-  type        = string
-  description = "OpenSearch Domain Name"
-  default     = "imeks-dev-log"
+variable "cluster_endpoint_public_access" {
+  description = "Enable public access to EKS cluster endpoint"
+  type        = bool
+  default     = true
 }
 
-variable "grafana_master_name" {
-  type        = string
-  description = "Grafana Master Username"
-  default     = "imeks_grafana"
+variable "cluster_endpoint_private_access" {
+  description = "Enable private access to EKS cluster endpoint"
+  type        = bool
+  default     = true
 }
 
-variable "grafana_master_pw" {
-  type        = string
-  description = "Grafana Master User Pw"
-  default     = "!imeks_password"
+# =============================================================================
+# EKS Access Configuration (Hybrid: Access Entries + RBAC)
+# =============================================================================
+
+variable "eks_admin_principals" {
+  description = "List of IAM principals (user/name or role/name) to grant EKS cluster admin access"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for p in var.eks_admin_principals : can(regex("^(user|role)/[a-zA-Z0-9_+=,.@-]+$", p))
+    ])
+    error_message = "Each principal must be in format 'user/name' or 'role/name'."
+  }
 }
 
-variable "search_master_name" {
-  type        = string
-  description = "OpenSearch Master Username"
-  default     = "imeks_opensearch"
+variable "eks_access_entries" {
+  description = "Map of IAM principals to Kubernetes groups for RBAC-based authorization"
+  type = map(object({
+    principal         = string # "user/name" or "role/name"
+    kubernetes_groups = list(string)
+  }))
+  default = {}
 }
 
-variable "search_master_pw" {
-  type        = string
-  description = "OpenSearch Master User Pw"
-  default     = "!Imeks_password123"
-}
+# =============================================================================
+# Tags
+# =============================================================================
 
-variable "iam_username" {
-  type        = string
-  description = "IAM User Name"
-  default     = "terraform"
+variable "tags" {
+  description = "Additional tags for all resources"
+  type        = map(string)
+  default     = {}
 }

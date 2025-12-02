@@ -1,0 +1,91 @@
+# =============================================================================
+# Viewer Role - Cluster-wide read-only permissions
+# =============================================================================
+# This ClusterRole grants read-only access to view resources across all
+# namespaces. Useful for monitoring, auditing, or support personnel.
+#
+# Usage:
+# 1. Configure eks_access_entries in terraform.tfvars:
+#    eks_access_entries = {
+#      "viewers" = {
+#        principal_arn     = "arn:aws:iam::ACCOUNT_ID:user/viewer"
+#        kubernetes_groups = ["viewers"]
+#      }
+#    }
+#
+# 2. Apply this manifest:
+#    kubectl apply -f viewer-role.yaml
+# =============================================================================
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: viewer-role
+rules:
+  # Core resources - read only
+  - apiGroups: [""]
+    resources:
+      - namespaces
+      - pods
+      - pods/log
+      - pods/status
+      - services
+      - endpoints
+      - configmaps
+      - persistentvolumeclaims
+      - persistentvolumes
+      - events
+      - nodes
+      - resourcequotas
+      - limitranges
+    verbs: ["get", "list", "watch"]
+
+  # Apps resources - read only
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - replicasets
+      - statefulsets
+      - daemonsets
+    verbs: ["get", "list", "watch"]
+
+  # Batch resources - read only
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["get", "list", "watch"]
+
+  # Autoscaling - read only
+  - apiGroups: ["autoscaling"]
+    resources:
+      - horizontalpodautoscalers
+    verbs: ["get", "list", "watch"]
+
+  # Networking - read only
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - ingresses
+      - networkpolicies
+    verbs: ["get", "list", "watch"]
+
+  # Storage - read only
+  - apiGroups: ["storage.k8s.io"]
+    resources:
+      - storageclasses
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: viewer-rolebinding
+subjects:
+  # Viewers group - mapped from eks_access_entries
+  - kind: Group
+    name: viewers
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: viewer-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,66 @@
+# =============================================================================
+# IMEKS Configuration Example
+# =============================================================================
+# Copy this file to terraform.tfvars and customize:
+#   cp terraform.tfvars.example terraform.tfvars
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# REQUIRED: You must set this value
+# -----------------------------------------------------------------------------
+project_name = "imeks"  # Max 9 characters (AWS IAM role name limit)
+
+# -----------------------------------------------------------------------------
+# COMMONLY CUSTOMIZED (Optional)
+# -----------------------------------------------------------------------------
+aws_region          = "ap-northeast-2"
+environment         = "testbed"
+kubernetes_version  = "1.34"
+
+# -----------------------------------------------------------------------------
+# NETWORK CONFIGURATION (Optional)
+# -----------------------------------------------------------------------------
+vpc_cidr                  = "10.0.0.0/16"
+availability_zones_count  = 2
+single_nat_gateway        = true  # false for HA (higher cost)
+
+# -----------------------------------------------------------------------------
+# EKS ACCESS CONFIGURATION (Optional)
+# Hybrid approach: Access Entries (authentication) + RBAC (authorization)
+# Format: "user/name" or "role/name" (ARN is auto-generated from current account)
+# -----------------------------------------------------------------------------
+
+# Admin users/roles - AWS managed policy grants immediate cluster admin access
+eks_admin_principals = [
+  # "user/admin-user",
+  # "role/AdminRole",
+]
+
+# General users/roles - Map to K8s groups, then use RBAC for fine-grained permissions
+# After terraform apply, deploy RBAC resources: kubectl apply -f examples/rbac/
+eks_access_entries = {
+  # Backend developers - map to K8s group for RBAC
+  # "backend-team" = {
+  #   principal         = "role/BackendTeamRole"
+  #   kubernetes_groups = ["backend-developers"]
+  # }
+
+  # Frontend developers
+  # "frontend-team" = {
+  #   principal         = "role/FrontendTeamRole"
+  #   kubernetes_groups = ["frontend-developers"]
+  # }
+
+  # Read-only viewers
+  # "viewers" = {
+  #   principal         = "user/viewer"
+  #   kubernetes_groups = ["viewers"]
+  # }
+}
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL TAGS (Optional)
+# -----------------------------------------------------------------------------
+tags = {
+  Author = "IML"
+}

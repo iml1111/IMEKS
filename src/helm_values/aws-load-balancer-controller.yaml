@@ -1,0 +1,70 @@
+# =============================================================================
+# AWS Load Balancer Controller Helm Values
+# =============================================================================
+
+# Replica count for high availability
+replicaCount: 2
+
+# Resource requests and limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Pod disruption budget
+podDisruptionBudget:
+  maxUnavailable: 1
+
+# Update strategy
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+
+# Enable cert-manager for webhook certificates (disabled - use internal)
+enableCertManager: false
+
+# Ingress class configuration
+ingressClass: alb
+createIngressClassResource: true
+
+# Default tags for AWS resources created by the controller
+defaultTags: {}
+
+# Enable shield (AWS Shield Advanced) - disabled by default
+enableShield: false
+
+# Enable WAF (AWS WAF) - disabled by default
+enableWaf: false
+
+# Enable WAFv2 (AWS WAFv2) - disabled by default
+enableWafv2: false
+
+# Logging configuration
+logLevel: info
+
+# Affinity rules for spreading across nodes
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - aws-load-balancer-controller
+          topologyKey: kubernetes.io/hostname
+
+# Topology spread constraints
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: aws-load-balancer-controller

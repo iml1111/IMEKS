@@ -1,0 +1,54 @@
+# =============================================================================
+# Metrics Server Helm Values
+# =============================================================================
+
+# Replica count for high availability
+replicas: 2
+
+# Resource requests and limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 200Mi
+  limits:
+    cpu: 100m
+    memory: 200Mi
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+# Update strategy
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+
+# Metrics configuration
+metrics:
+  enabled: false
+
+# Service monitor for Prometheus (disabled as per requirements)
+serviceMonitor:
+  enabled: false
+
+# Additional container arguments
+args:
+  - --kubelet-preferred-address-types=InternalIP
+  - --kubelet-use-node-status-port
+  - --metric-resolution=15s
+
+# Affinity rules for spreading across nodes
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - metrics-server
+          topologyKey: kubernetes.io/hostname

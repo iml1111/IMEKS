@@ -1,0 +1,23 @@
+# =============================================================================
+# Terraform Backend Configuration Example
+# =============================================================================
+# Copy this file to terraform.tfvars and customize:
+#   cp terraform.tfvars.example terraform.tfvars
+# =============================================================================
+
+# AWS Region (default: ap-northeast-2)
+region = "ap-northeast-2"
+
+# Project name - used as prefix for all resource names
+# S3 bucket names will include your AWS account ID for global uniqueness
+project_name = "imeks"
+
+# Optional: Override auto-generated names
+# If left empty, names will be generated as:
+#   - DynamoDB: {project_name}-terraform-lock
+#   - S3 State: {project_name}-terraform-states-{account_id}
+#   - S3 Logs:  {project_name}-terraform-logs-{account_id}
+#
+# dynamodb_table_name  = "my-custom-lock-table"
+# s3_state_bucket_name = "my-custom-state-bucket"
+# s3_log_bucket_name   = "my-custom-logs-bucket"
