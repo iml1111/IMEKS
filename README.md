@@ -4,7 +4,7 @@ Production-ready AWS EKS infrastructure boilerplate using Terraform. Deploy a co
 
 ## Features
 
-- **EKS Cluster**: Kubernetes 1.32 with managed node groups
+- **EKS Cluster**: Kubernetes 1.34 with managed node groups
 - **VPC**: Multi-AZ VPC with public/private subnets
 - **EKS Addons**: CoreDNS, kube-proxy, vpc-cni, aws-ebs-csi-driver
 - **Metrics Server**: Pre-installed for HPA/VPA support
@@ -135,7 +135,7 @@ aws eks update-kubeconfig --region ap-northeast-2 --name <cluster-name>
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `kubernetes_version` | Kubernetes version | `1.32` |
+| `kubernetes_version` | Kubernetes version | `1.34` |
 | `vpc_cidr` | VPC CIDR block | `10.0.0.0/16` |
 | `availability_zones_count` | Number of AZs | `2` |
 | `single_nat_gateway` | Use single NAT GW | `true` |
