@@ -93,6 +93,32 @@ variable "cluster_endpoint_private_access" {
 }
 
 # =============================================================================
+# EKS Access Configuration (Hybrid: Access Entries + RBAC)
+# =============================================================================
+
+variable "eks_admin_principals" {
+  description = "List of IAM principals (user/name or role/name) to grant EKS cluster admin access"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for p in var.eks_admin_principals : can(regex("^(user|role)/[a-zA-Z0-9_+=,.@-]+$", p))
+    ])
+    error_message = "Each principal must be in format 'user/name' or 'role/name'."
+  }
+}
+
+variable "eks_access_entries" {
+  description = "Map of IAM principals to Kubernetes groups for RBAC-based authorization"
+  type = map(object({
+    principal         = string # "user/name" or "role/name"
+    kubernetes_groups = list(string)
+  }))
+  default = {}
+}
+
+# =============================================================================
 # Tags
 # =============================================================================
 

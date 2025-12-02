@@ -45,6 +45,9 @@ module "eks" {
   cluster_endpoint_public_access  = var.cluster_endpoint_public_access
   cluster_endpoint_private_access = var.cluster_endpoint_private_access
 
+  # Access Entries (Hybrid: AWS policy for admin, K8s groups for RBAC)
+  access_entries = local.all_access_entries
+
   tags = local.common_tags
 
   depends_on = [module.vpc]

@@ -34,6 +34,12 @@ variable "cluster_endpoint_private_access" {
   default     = true
 }
 
+variable "access_entries" {
+  description = "Map of access entries to add to the cluster"
+  type        = any
+  default     = {}
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)

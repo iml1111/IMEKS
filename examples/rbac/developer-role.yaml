@@ -1,0 +1,93 @@
+# =============================================================================
+# Developer Role - Namespace-scoped permissions
+# =============================================================================
+# This Role grants developers permissions to manage common workload resources
+# within a specific namespace.
+#
+# Usage:
+# 1. Configure eks_access_entries in terraform.tfvars:
+#    eks_access_entries = {
+#      "backend-team" = {
+#        principal_arn     = "arn:aws:iam::ACCOUNT_ID:role/BackendTeamRole"
+#        kubernetes_groups = ["backend-developers"]
+#      }
+#    }
+#
+# 2. Apply this manifest:
+#    kubectl apply -f developer-role.yaml
+# =============================================================================
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer-role
+  namespace: default  # Change to your target namespace
+rules:
+  # Core workload resources
+  - apiGroups: [""]
+    resources:
+      - pods
+      - pods/log
+      - pods/status
+      - pods/exec
+      - pods/portforward
+      - services
+      - endpoints
+      - configmaps
+      - secrets
+      - persistentvolumeclaims
+      - events
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Apps resources
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - deployments/scale
+      - deployments/status
+      - replicasets
+      - replicasets/scale
+      - statefulsets
+      - statefulsets/scale
+      - daemonsets
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Batch resources
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Autoscaling
+  - apiGroups: ["autoscaling"]
+    resources:
+      - horizontalpodautoscalers
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Networking
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - ingresses
+      - networkpolicies
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-rolebinding
+  namespace: default  # Change to your target namespace
+subjects:
+  # Backend developers group - mapped from eks_access_entries
+  - kind: Group
+    name: backend-developers
+    apiGroup: rbac.authorization.k8s.io
+  # Frontend developers group - mapped from eks_access_entries
+  - kind: Group
+    name: frontend-developers
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-role
+  apiGroup: rbac.authorization.k8s.io

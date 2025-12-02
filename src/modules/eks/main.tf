@@ -98,5 +98,8 @@ module "eks" {
   # Enable cluster creator admin permissions
   enable_cluster_creator_admin_permissions = true
 
+  # Access Entries (Hybrid: AWS policy for admin, K8s groups for RBAC)
+  access_entries = var.access_entries
+
   tags = var.tags
 }

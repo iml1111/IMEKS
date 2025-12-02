@@ -72,7 +72,9 @@ cp backend.tf.example backend.tf
 terraform init
 
 # First deployment requires two-step apply (EKS module v21.x limitation)
+terraform plan -target=module.vpc
 terraform apply -target=module.vpc
+terraform plan
 terraform apply
 ```
 

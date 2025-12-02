@@ -9,17 +9,16 @@ AWS EKS Terraform boilerplate for production-ready Kubernetes infrastructure dep
 ```
 src/
 ├── main.tf           # Orchestrates VPC → EKS → Addons
+├── locals.tf         # Access entries merge logic
 ├── modules/
 │   ├── vpc/          # terraform-aws-modules/vpc/aws v6.5.1
-│   │   ├── main.tf
-│   │   ├── flow-log.tf    # Standalone flow-log module (v7.x ready)
-│   │   └── outputs.tf
 │   ├── eks/          # terraform-aws-modules/eks/aws v21.10.1
-│   │   ├── main.tf
-│   │   ├── irsa.tf        # EBS CSI Driver IRSA
-│   │   └── outputs.tf
 │   └── addons/       # Metrics Server + ALB Controller (IRSA)
 └── helm_values/
+
+examples/
+├── hello-world/      # Sample deployment
+└── rbac/             # RBAC templates (developer, viewer roles)
 
 scripts/              # Deployment/cleanup scripts
 assets/terraform_backend/  # S3 + DynamoDB for remote state
@@ -45,6 +44,13 @@ assets/terraform_backend/  # S3 + DynamoDB for remote state
 5. **Naming Convention**: `{project_name}-{environment}` (max 9 chars for project_name)
 
 6. **VPC Flow Log**: Separated to `flow-log.tf` for v7.x compatibility
+
+7. **Access Control** (Hybrid approach):
+   - Authentication: EKS Access Entries (AWS API)
+   - Admin: `eks_admin_principals` → AWS managed policy
+   - Users: `eks_access_entries` → K8s group mapping + RBAC
+   - Input format: `"user/name"` or `"role/name"` (ARN auto-generated)
+   - RBAC examples: `examples/rbac/`
 
 ## Module Dependencies
 
