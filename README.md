@@ -73,9 +73,9 @@ terraform init
 
 # First deployment requires two-step apply (EKS module v21.x limitation)
 terraform plan -target=module.vpc
-terraform apply -target=module.vpc
+terraform apply -target=module.vpc -auto-approve
 terraform plan
-terraform apply
+terraform apply -auto-approve
 ```
 
 > **Note**: The two-step deployment is required only for the first `terraform apply`. Subsequent applies work normally. This is due to EKS module v21.x's internal data source dependencies.
