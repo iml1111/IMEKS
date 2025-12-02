@@ -16,25 +16,37 @@ echo "=============================================="
 
 # Step 1: Configure kubectl
 echo ""
-echo "[1/5] Configuring kubectl..."
+echo "[1/6] Configuring kubectl..."
 aws eks update-kubeconfig --region "$REGION" --name "$CLUSTER_NAME"
 echo "  ✓ kubectl configured"
 
 # Step 2: Verify cluster connection
 echo ""
-echo "[2/5] Verifying cluster connection..."
+echo "[2/6] Verifying cluster connection..."
 kubectl cluster-info
 echo "  ✓ Cluster connection verified"
 
-# Step 3: Deploy hello-world example
+# Step 3: Deploy RBAC resources
 echo ""
-echo "[3/5] Deploying hello-world example..."
+echo "[3/6] Deploying RBAC resources..."
+kubectl apply -f "$PROJECT_ROOT/examples/rbac/"
+echo "  ✓ RBAC resources applied"
+
+# Show RBAC status
+echo ""
+echo "  RBAC Resources:"
+kubectl get roles,rolebindings -A 2>/dev/null | grep -E "(developer|viewer)" || true
+kubectl get clusterroles,clusterrolebindings 2>/dev/null | grep -E "(developer|viewer)" || true
+
+# Step 4: Deploy hello-world example
+echo ""
+echo "[4/6] Deploying hello-world example..."
 kubectl apply -f "$PROJECT_ROOT/examples/hello-world/"
 echo "  ✓ Resources applied"
 
-# Step 4: Wait for pods to be ready
+# Step 5: Wait for pods to be ready
 echo ""
-echo "[4/5] Waiting for pods to be ready..."
+echo "[5/6] Waiting for pods to be ready..."
 kubectl wait --for=condition=Ready pods -l app=hello-world -n "$NAMESPACE" --timeout=120s
 echo "  ✓ Pods are ready"
 
@@ -43,9 +55,9 @@ echo ""
 echo "  Pod Status:"
 kubectl get pods -n "$NAMESPACE" -o wide
 
-# Step 5: Wait for ALB to be provisioned
+# Step 6: Wait for ALB to be provisioned
 echo ""
-echo "[5/5] Waiting for ALB to be provisioned (this may take 2-3 minutes)..."
+echo "[6/6] Waiting for ALB to be provisioned (this may take 2-3 minutes)..."
 echo "  Checking Ingress status..."
 
 MAX_RETRIES=30
@@ -104,6 +116,10 @@ echo ""
 echo "  Cluster:   $CLUSTER_NAME"
 echo "  Namespace: $NAMESPACE"
 echo "  ALB URL:   http://$ALB_ADDRESS"
+echo ""
+echo "  RBAC Resources:"
+echo "  - Role: developer-role (namespace: development)"
+echo "  - ClusterRole: viewer-role"
 echo ""
 echo "  To cleanup: ./scripts/cleanup-example.sh"
 echo ""
