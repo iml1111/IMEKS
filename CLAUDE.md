@@ -32,7 +32,12 @@ assets/terraform_backend/  # S3 + DynamoDB for remote state
    - Metrics Server (chart 3.12.2)
    - AWS Load Balancer Controller (chart 1.16.0)
 
-4. **Naming Constraint**: `project_name` max 9 characters (AWS IAM role name limit: 38 chars)
+4. **Naming Convention**: Simplified resource naming
+   - `cluster_name` = `{project_name}-{environment}` (e.g., `imeks-dev`)
+   - `vpc_name` = `{project_name}-{environment}` (e.g., `imeks-dev`)
+   - `project_name` max 9 characters (AWS IAM role name limit: 38 chars)
+
+5. **Backend State**: Key pattern uses project name (e.g., `imeks.terraform.tfstate`)
 
 ## Module Dependencies
 
@@ -73,3 +78,8 @@ Update `vpc_cidr` in `terraform.tfvars` and adjust `local.private_subnet_cidrs` 
 - **Helm 3.x syntax**: Use `kubernetes = { ... }` not `kubernetes { ... }` block
 - **IAM module v6.x**: Output names are `arn`, `name` (not `iam_role_arn`, `iam_role_name`)
 - **EKS module v21.x**: Variable names changed (e.g., `name` not `cluster_name`, `kubernetes_version` not `cluster_version`)
+- **First deployment requires two-step apply**: EKS module v21.x has internal data source dependencies (`partition`, `account_id`) that cause `count` argument errors on fresh deployments. Use:
+  ```bash
+  terraform apply -target=module.vpc
+  terraform apply
+  ```

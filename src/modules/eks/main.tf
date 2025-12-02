@@ -46,6 +46,7 @@ module "eks" {
   # Managed Node Groups
   eks_managed_node_groups = {
     main = {
+      create          = true
       name            = "${var.cluster_name}-main"
       use_name_prefix = false
 

@@ -69,8 +69,13 @@ cp terraform.tfvars.example terraform.tfvars
 cp backend.tf.example backend.tf
 # Edit terraform.tfvars and backend.tf with your values
 terraform init
+
+# First deployment requires two-step apply (EKS module v21.x limitation)
+terraform apply -target=module.vpc
 terraform apply
 ```
+
+> **Note**: The two-step deployment is required only for the first `terraform apply`. Subsequent applies work normally. This is due to EKS module v21.x's internal data source dependencies.
 
 ### 3. Configure kubectl
 

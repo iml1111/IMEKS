@@ -10,7 +10,7 @@
 terraform {
   backend "s3" {
     bucket         = "alocados-terraform-states"
-    key            = "eks/terraform.tfstate"
+    key            = "imeks.terraform.tfstate"
     region         = "ap-northeast-2"
     dynamodb_table = "alocados-terraform-lock"
     encrypt        = true

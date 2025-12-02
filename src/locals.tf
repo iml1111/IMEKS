@@ -5,8 +5,8 @@
 locals {
   # Naming
   name_prefix  = "${var.project_name}-${var.environment}"
-  cluster_name = "${local.name_prefix}-eks"
-  vpc_name     = "${local.name_prefix}-vpc"
+  cluster_name = "${local.name_prefix}"
+  vpc_name     = "${local.name_prefix}"
 
   # Availability Zones
   azs = slice(data.aws_availability_zones.available.names, 0, var.availability_zones_count)
