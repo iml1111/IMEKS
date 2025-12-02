@@ -41,31 +41,35 @@ module "eks" {
       most_recent    = true
       before_compute = true
     }
+    aws-ebs-csi-driver = {
+      most_recent              = true
+      service_account_role_arn = module.ebs_csi_driver_irsa.arn
+    }
   }
 
   # Managed Node Groups
   eks_managed_node_groups = {
-    main = {
+    default = {
       create          = true
-      name            = "${var.cluster_name}-main"
+      name            = "${var.cluster_name}-default"
       use_name_prefix = false
 
       # Node Group Size
-      min_size     = var.node_min_size
-      max_size     = var.node_max_size
-      desired_size = var.node_desired_size
+      min_size     = 1
+      max_size     = 5
+      desired_size = 2
 
       # Instance Configuration
       ami_type       = "AL2023_x86_64_STANDARD"
-      instance_types = var.node_instance_types
-      capacity_type  = var.node_capacity_type
+      instance_types = ["c5.xlarge"]
+      capacity_type  = "ON_DEMAND"
 
       # EBS Configuration
       block_device_mappings = {
         xvda = {
           device_name = "/dev/xvda"
           ebs = {
-            volume_size           = var.node_disk_size
+            volume_size           = 50
             volume_type           = "gp3"
             iops                  = 3000
             throughput            = 125

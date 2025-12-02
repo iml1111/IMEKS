@@ -28,8 +28,8 @@ variable "environment" {
   default     = "dev"
 
   validation {
-    condition     = contains(["dev", "staging", "prod"], var.environment)
-    error_message = "Environment must be one of: dev, staging, prod."
+    condition     = contains(["dev", "staging", "prod", "testbed"], var.environment)
+    error_message = "Environment must be one of: dev, staging, prod, testbed."
   }
 }
 
@@ -90,67 +90,6 @@ variable "cluster_endpoint_private_access" {
   description = "Enable private access to EKS cluster endpoint"
   type        = bool
   default     = true
-}
-
-# =============================================================================
-# Node Group Configuration
-# =============================================================================
-
-variable "node_instance_types" {
-  description = "Instance types for managed node group"
-  type        = list(string)
-  default     = ["c5.xlarge"]
-}
-
-variable "node_capacity_type" {
-  description = "Capacity type: ON_DEMAND or SPOT"
-  type        = string
-  default     = "ON_DEMAND"
-
-  validation {
-    condition     = contains(["ON_DEMAND", "SPOT"], var.node_capacity_type)
-    error_message = "Capacity type must be ON_DEMAND or SPOT."
-  }
-}
-
-variable "node_desired_size" {
-  description = "Desired number of nodes"
-  type        = number
-  default     = 2
-}
-
-variable "node_min_size" {
-  description = "Minimum number of nodes"
-  type        = number
-  default     = 1
-}
-
-variable "node_max_size" {
-  description = "Maximum number of nodes"
-  type        = number
-  default     = 5
-}
-
-variable "node_disk_size" {
-  description = "Root disk size in GB for worker nodes"
-  type        = number
-  default     = 50
-}
-
-# =============================================================================
-# Addon Configuration (Chart Versions)
-# =============================================================================
-
-variable "metrics_server_chart_version" {
-  description = "Metrics Server Helm chart version"
-  type        = string
-  default     = "3.12.2"
-}
-
-variable "alb_controller_chart_version" {
-  description = "AWS Load Balancer Controller Helm chart version"
-  type        = string
-  default     = "1.16.0"
 }
 
 # =============================================================================

@@ -51,3 +51,9 @@ output "cluster_primary_security_group_id" {
   description = "Cluster security group created by EKS"
   value       = module.eks.cluster_primary_security_group_id
 }
+
+# IRSA Outputs
+output "ebs_csi_driver_irsa_arn" {
+  description = "EBS CSI Driver IRSA role ARN"
+  value       = module.ebs_csi_driver_irsa.arn
+}

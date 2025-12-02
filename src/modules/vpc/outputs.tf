@@ -41,3 +41,14 @@ output "azs" {
   description = "List of availability zones used"
   value       = module.vpc.azs
 }
+
+# Flow Log Outputs
+output "flow_log_id" {
+  description = "VPC Flow Log ID"
+  value       = module.vpc_flow_log.id
+}
+
+output "flow_log_cloudwatch_log_group_arn" {
+  description = "CloudWatch Log Group ARN for VPC Flow Logs"
+  value       = module.vpc_flow_log.cloudwatch_log_group_arn
+}

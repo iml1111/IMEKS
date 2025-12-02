@@ -45,13 +45,6 @@ module "eks" {
   cluster_endpoint_public_access  = var.cluster_endpoint_public_access
   cluster_endpoint_private_access = var.cluster_endpoint_private_access
 
-  node_instance_types = var.node_instance_types
-  node_capacity_type  = var.node_capacity_type
-  node_desired_size   = var.node_desired_size
-  node_min_size       = var.node_min_size
-  node_max_size       = var.node_max_size
-  node_disk_size      = var.node_disk_size
-
   tags = local.common_tags
 
   depends_on = [module.vpc]
